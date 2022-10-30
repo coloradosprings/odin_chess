@@ -229,6 +229,63 @@ describe Chess do
         end
        end
     end
+    describe '#promote_pawn' do
+        subject(:game){Chess.new}
+        context 'when object with class "PawnBlack" is in @board[0] and gets receives "Queen\\n"' do
+            before do
+                allow(game).to receive(:gets).and_return('Queen')
+                allow(game).to receive(:puts)
+            end
+            it 'replace @board[position[0][position[1]] to Queen.new("black",position)' do
+                board = game.instance_variable_get(:@board)
+                board[0][1] = PawnWhite.new('white',[0,1])
+                print board[0][1].class
+                expect{game.promote_pawn}.to change{board[0][1].class}.to eq(Queen)
+                
+            end
+        end
+    end
+    describe '#check_en_passant' do
+        subject(:game){Chess.new}
+        context 'when PawnBlack\'s [0] position is 3 and previous position is equal to 1' do
+            it 'sets PawnBlack\'s @can_en_passent to true' do
+                board = game.instance_variable_get(:@board)
+                pawn = board[1][2]
+                board[1][2].make_move(board,[3,2])
+                expect{game.check_en_passent}.to change{pawn.instance_variable_get(:@can_en_passent)}.to eq(true)
+
+            end
+        end
+        context 'when PawnBlack\'s [0] position is 3 and previous position is equal to 2' do
+            it 'sets PawnBlack\'s @can_en_passent to false' do
+                board = game.instance_variable_get(:@board)
+                pawn = board[1][2]
+                board[1][2].make_move(board,[2,2])
+                board[2][2].make_move(board,[3,2])
+                expect{game.check_en_passent}.to change{pawn.instance_variable_get(:@can_en_passent)}.to eq(false)
+
+            end
+        end
+        context 'when PawnWhite\'s [0] position is 4 and previous position is equal to 6' do
+            it 'sets PawnBlack\'s @can_en_passent to true' do
+                board = game.instance_variable_get(:@board)
+                pawn = board[6][3]
+                board[6][3].make_move(board,[4,3])
+                expect{game.check_en_passent}.to change{pawn.instance_variable_get(:@can_en_passent)}.to eq(true)
+
+            end
+        end
+        context 'when PawnBlack\'s [0] position is 4 and previous position is equal to 5' do
+            it 'sets PawnBlack\'s @can_en_passent to false' do
+                board = game.instance_variable_get(:@board)
+                pawn = board[6][3]
+                board[6][3].make_move(board,[5,3])
+                board[5][3].make_move(board,[4,3])
+                expect{game.check_en_passent}.to change{pawn.instance_variable_get(:@can_en_passent)}.to eq(false)
+
+            end
+        end
+    end
 end
 # [[0, 0], [0, 1], [0, 2], [0, 3], [0, 4], [0, 5], [0, 6], [0, 7], 
 # [1, 0], [1, 1], [1, 2], [1, 3], [1, 4], [1, 5], [1, 6], [1, 7],

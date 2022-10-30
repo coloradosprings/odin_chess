@@ -53,8 +53,10 @@ class PawnBlack < Figure
                             (board[tupel[0]][tupel[1]]).color != self.color ? true : false
                         else
                             false
-                        end    
-                check1 || check2 || check3                            
+                        end 
+                item_check4 = tupel[0] - 1 >= 0 ? board[tupel[0] - 1][tupel[1]] : nil
+                check4 = position[0] == 4 && tupel[0] == 5 && (tupel[1] - position[1]).abs == 1 && item_check4 != ' ' && item_check4.class == PawnWhite && item_check4.instance_variable_get(:@can_en_passent)    
+                check1 || check2 || check3 || check4                       
         end  
     end
 end
@@ -72,8 +74,11 @@ class PawnWhite < Figure
                             (board[tupel[0]][tupel[1]]).color != self.color ? true : false
                         else
                             false
-                        end               
-                check1 || check2 || check3                            
+                        end   
+                        
+                item_check4 = tupel[0] + 1 <= 7 ? board[tupel[0] + 1][tupel[1]] : nil
+                check4 = position[0] == 3 && tupel[0] == 2 && (tupel[1] - position[1]).abs == 1 && item_check4 != ' ' && item_check4.class == PawnBlack && item_check4.instance_variable_get(:@can_en_passent)           
+                check1 || check2 || check3 || check4                            
         end  
     end
 end

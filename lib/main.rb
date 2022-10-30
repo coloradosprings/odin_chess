@@ -19,6 +19,7 @@ class Chess
     end
 
     def check_board
+        promote_pawn
         @white_ischecked = is_check(@board,'white')
         @black_ischecked = is_check(@board,'black')
         puts "check" if @white_ischecked || @black_ischecked
@@ -32,6 +33,8 @@ class Chess
             @game_over = true
             puts 'draw'
         end 
+        check_en_passant
+        
     end
     def check_draw(color)
         figures_to_check = []
@@ -116,15 +119,24 @@ class Chess
         return true
         
     end
-
-    # def get_rounds
-    #     rounds = gets.chomp.to_i
-    #     until rounds.is_a? Integer && rounds > 0
-    #         puts 'Input a natural number greater than 0'
-    #         rounds = gets.chomp.to_i
-    #     end
-    # end
-
+    def check_en_passent
+        @board[3].each do |position|
+            if position != ' '
+                if position.class == PawnBlack
+                    check = (position.instance_variable_get(:@previous_position))[0] == 1
+                    position.instance_variable_set(:@can_en_passent,check)
+                end
+            end
+        end
+        @board[4].each do |position| 
+            if position != ' '
+                if position.class == PawnWhite
+                    check = (position.instance_variable_get(:@previous_position))[0] == 6
+                    position.instance_variable_set(:@can_en_passent,check)
+                end
+            end
+        end
+    end
     def display_board
         print "___________________\n"
         for i in 1..8 
@@ -143,6 +155,40 @@ class Chess
         print "|  a b c d e f g h|\u23B8\n"
         19.times{print "\u203E"}   
         print "\n"
+    end
+    def promote_pawn
+        @board[0].each do |item|
+            if item != ' '
+                if item.class == PawnWhite
+                    input = 'x'
+                    loop do
+                        puts "'Queen', 'Knight', 'Bishop' or 'Rook'?"
+                        input = gets.chomp
+                        break if ['Queen', 'Knight', 'Bishop','Rook'].include?(input)
+                    end
+                    dict = {'Queen'=>Queen,'Rook'=>Rook,'Bishop'=> Bishop,'Kingt'=> Knight}
+                    position = item.position
+                    new_item = dict[input].new('white',position)
+                    @board[position[0]][position[1]] = new_item
+                end
+            end
+        end
+        @board[7].each do |item|
+            if item != ' '
+                if item.class == PawnBlack
+                    input = 'x'
+                    loop do
+                        puts "'Queen', 'Knight', 'Bishop' or 'Rook'?"
+                        input = gets.chomp
+                        break if ['Queen', 'Knight', 'Bishop','Rook'].include?(input)
+                    end
+                    dict = {'Queen'=>Queen,'Rook'=>Rook,'Bishop'=> Bishop,'Kingt'=> Knight}
+                    position = item.position
+                    new_item = dict[input].new('black',position)
+                    @board[position[0]][position[1]] = new_item
+                end
+            end
+        end
     end
     def update_castle
         case @board
@@ -249,8 +295,7 @@ class Chess
                     check_item.make_move(@board,[row2,col2])
                     if is_check(@board,@currentplayer)
                         check_item.return_move(@board)
-                        puts 'invalid input'
-                        next
+                        puts 'invalid input';next
                     end
                     break
                 in [['save']]

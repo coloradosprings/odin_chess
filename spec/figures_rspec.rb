@@ -11,18 +11,46 @@ describe PawnWhite do
                 
             end
         end
-        # context 'if position equals [4,5] and [5,6] is not empty' do
-        #     before do
-        #         pawn.instance_variable_set(:@position,[4,5])
-        #     end
-        #     it 'returns [[5,5],[5,6]]' do
-        #         board = Array.new(8){Array.new(8,' ')}
-        #         board[5][6] = Rook.new('black',[5,6])
-        #         expect(pawn.find_moves(board)).to eq([[5,5],[5,6]])
-                
-        #     end
-            
-        # end
+        context 'when position[1] is equal to 3 and next item in the row is PawnBlack with @can_en_passent equal to true' do
+            before do
+                pawn.instance_variable_set(:@position,[3,3])
+            end
+            it 'returns coordinatens with [2,4] inlcuded' do
+                board = Array.new(8){Array.new(8,' ')}
+                board[3][3] = pawn
+                board[3][4] = PawnBlack.new('black',[3,4])
+                board[3][4].instance_variable_set(:@can_en_passent,true)
+                expect(pawn.find_moves(board)).to eq([[2,3],[2,4]])
+            end
+        end
+        context 'when position[1] is equal to 3 and previous item in the row is PawnBlack with @can_en_passent equal to true' do
+            before do
+                pawn.instance_variable_set(:@position,[3,3])
+            end
+            it 'returns coordinatens with [2,2] included' do
+                board = Array.new(8){Array.new(8,' ')}
+                board[3][3] = pawn
+                board[3][2] = PawnBlack.new('black',[3,2])
+                board[3][4] = PawnBlack.new('black',[3,4])
+                board[3][4].instance_variable_set(:@can_en_passent,true)
+                board[3][2].instance_variable_set(:@can_en_passent,true)
+                expect(pawn.find_moves(board)).to eq([[2,2],[2,3],[2,4]])
+            end
+        end
+        context 'when position[1] is equal to 3 and next item in the row is PawnBlack with @can_en_passent equal to false' do
+            before do
+                pawn.instance_variable_set(:@position,[3,3])
+            end
+            it 'returns coordinatens with [2,4] not included' do
+                board = Array.new(8){Array.new(8,' ')}
+                board[3][3] = pawn
+                board[3][4] = PawnBlack.new('black',[3,4])
+                board[3][4].instance_variable_set(:@can_en_passent,false)
+                expect(pawn.find_moves(board)).to eq([[2,3]])
+            end
+
+        end
+
     end
     describe '#make_move' do
         subject(:pawn){PawnWhite.new('white',[1,1])}
@@ -36,18 +64,59 @@ describe PawnWhite do
                 
             end
         end
-        # context 'when given a valid move [3,1]' do
-        #     before do
-        #         allow(pawn).to receive(:find_moves).and_return([[3,1]])
-        #     end
-        #     it 'changes position to equal [3,1]' do
-        #         board = Array.new(8){Array.new(8)}
-        #         board[1][1] = pawn
-        #         expect{pawn.make_move(board,[3,1])}.to change{pawn.position}.to eq([3,1])
-                               
-        #     end
-        # end
     end   
+end
+
+describe PawnBlack do
+    describe '#find_moves' do
+        subject(:pawn){PawnBlack.new('white',[1,6])}
+        context 'if position equals [1,1]' do
+            it 'return [[2,6],[3,6]]' do
+                board = Array.new(8){Array.new(8,' ')}
+                #allow(find_moves).to receive(board)
+                expect(pawn.find_moves(board)).to eq([[2,6],[3,6]])
+                
+            end
+        end
+        context 'when position[1] is equal to 4 and next item in the row is PawnBlack with @can_en_passent equal to true' do
+            before do
+                pawn.instance_variable_set(:@position,[4,3])
+            end
+            it 'returns coordinatens with [5,4] inlcuded' do
+                board = Array.new(8){Array.new(8,' ')}
+                board[4][3] = pawn
+                board[4][4] = PawnWhite.new('black',[4,4])
+                board[4][4].instance_variable_set(:@can_en_passent,true)
+                expect(pawn.find_moves(board)).to eq([[5,3],[5,4]])
+            end
+        end
+        context 'when position[1] is equal to 3 and previous item in the row is PawnBlack with @can_en_passent equal to true' do
+            before do
+                pawn.instance_variable_set(:@position,[4,3])
+            end
+            it 'returns coordinatens with [2,2] included' do
+                board = Array.new(8){Array.new(8,' ')}
+                board[4][3] = pawn
+                board[4][2] = PawnWhite.new('black',[4,2])
+                board[4][2].instance_variable_set(:@can_en_passent,true)
+                expect(pawn.find_moves(board)).to eq([[5,2],[5,3]])
+            end
+        end
+        context 'when position[1] is equal to 3 and next item in the row is PawnBlack with @can_en_passent equal to false' do
+            before do
+                pawn.instance_variable_set(:@position,[4,3])
+            end
+            it 'returns coordinatens with [5,4] not included' do
+                board = Array.new(8){Array.new(8,' ')}
+                board[4][3] = pawn
+                board[4][4] = PawnWhite.new('black',[4,4])
+                board[4][4].instance_variable_set(:@can_en_passent,false)
+                expect(pawn.find_moves(board)).to eq([[5,3]])
+            end
+
+        end
+
+    end
 end
 
 describe Rook do
